@@ -1,19 +1,18 @@
-import aiohttp
+import requests
 
-APT_URL = "https://api.cobalt.tools/"
+COBALT_API_URL = "https://api.cobalt.tools/"
+COBALT_HEADERS = {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJrTzZodEpnaiIsInN1YiI6IkF2SGZYMmYxIiwiZXhwIjoxNzQ1NDg5NDI5fQ.9FmAL09xPtcyfwpzd0SG1n4qONrTAWwPk07NffzHAjU",
+    "Content-Type": "application/json",
+}
 
-async def fetch_cobalt_data(file_url: str) -> dict:
-    headers = {
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "url": file_url,
-        "vt": False
-    }
-
-    async with aiohttp.ClientSession() as session:
-        async with session.post(APT_URL, json=payload, headers=headers) as response:
-            if response.status == 200:
-                return await response.json()
-            else:
-                return {"error": f"Ошибка: {response.status}"}
+def get_direct_video_url(video_url: str) -> str | None:
+    payload = {"url": video_url}
+    try:
+        response = requests.post(COBALT_API_URL, headers=COBALT_HEADERS, json=payload)
+        response.raise_for_status()
+        data = response.json()
+        return data.get("url")
+    except Exception as e:
+        print(f"[ERROR] Не удалось получить ссылку на видео: {e}")
+        return None

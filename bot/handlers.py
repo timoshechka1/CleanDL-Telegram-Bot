@@ -3,6 +3,7 @@ import re
 from telegram import Update
 from telegram.ext import ContextTypes
 
+
 URL_REGEX = r'https?://[^\s]+'
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
