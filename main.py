@@ -1,5 +1,4 @@
 from aiogram import Bot, Dispatcher
-from aiogram.types import BotCommand
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage

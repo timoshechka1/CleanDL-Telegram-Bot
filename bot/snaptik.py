@@ -1,20 +1,19 @@
-from playwright.sync_api import sync_playwright
-import time
+from playwright.async_api import async_playwright
 
-def get_tiktok_download_link(url: str) -> str:
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.goto("https://snaptik.app/en")
+async def get_tiktok_download_link(url: str) -> str:
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.goto("https://snaptik.app/en")
 
         input_selector = "input[name='url']"
-        page.fill(input_selector, url)
+        await page.fill(input_selector, url)
+        await page.click("button[type='submit']")
 
-        page.click("button[type='submit']")
+        await page.wait_for_selector("a.download-link", timeout=15000)
 
-        page.wait_for_selector("a.download-link", timeout=15000)
+        element = await page.query_selector("a.download-link")
+        download_link = await element.get_attribute("href")
 
-        download_link = page.query_selector("a.download-link").get_attribute("href")
-
-        browser.close()
+        await browser.close()
         return download_link
