@@ -9,7 +9,10 @@ COBALT_HEADERS = {
 def get_direct_video_url(video_url: str) -> str | None:
     payload = {"url": video_url}
     try:
+        print("[DEBUG] Отправляем запрос с payload:", payload)
         response = requests.post(COBALT_API_URL, headers=COBALT_HEADERS, json=payload)
+        print("[DEBUG] Статус код ответа:", response.status_code)
+        print("[DEBUG] Тело ответа:", response.text)
         response.raise_for_status()
         data = response.json()
         return data.get("url")
