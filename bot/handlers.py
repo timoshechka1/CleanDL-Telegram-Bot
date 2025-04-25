@@ -22,4 +22,5 @@ async def handle_tiktok_link(message: Message):
 
         await message.reply_video(video_data)
     except Exception as e:
-        await message.reply(f"Произошла ошибка: {e}")
+        await message.reply(f"Произошла ошибка: {e}", parse_mode=None)
+
