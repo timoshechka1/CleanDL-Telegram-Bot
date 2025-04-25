@@ -11,3 +11,4 @@ async def start_handler(message: Message):
 @router.message()
 async def handle_tiktok_link(message: Message):
     await message.answer("Ты отправил ссылку!")
+    

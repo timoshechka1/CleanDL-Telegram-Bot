@@ -1,14 +1,18 @@
 import requests
+from aiogram import Router
+from aiogram.types import Message
+from aiogram.filters import Command
 
-from aiogram import types
 from bot.snaptik import get_tiktok_download_link
 
-@dp.message_handler(commands=["start"])
-async def start_handler(message: types.Message):
+router = Router()
+
+@router.message(Command("start"))
+async def start_handler(message: Message):
     await message.reply("Пришли ссылку на видео TikTok")
 
-@dp.message_handler()
-async def handle_tiktok_link(message: types.Message):
+@router.message()
+async def handle_tiktok_link(message: Message):
     url = message.text.strip()
     await message.reply("Скачиваю видео...")
 
