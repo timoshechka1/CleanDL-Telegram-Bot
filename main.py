@@ -1,16 +1,12 @@
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
-from config import BOT_TOKEN
-from bot.handlers import start, download_video
+from aiogram import Router
+from aiogram.types import Message
 
-def main():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
+router = Router()
 
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, download_video))
+@router.message(commands=["start"])
+async def start_handler(message: Message):
+    await message.answer("Привет!")
 
-    print("Бот Запущен...")
-
-    app.run_polling()
-
-if __name__ == "__main__":
-    main()
+@router.message()
+async def handle_tiktok_link(message: Message):
+    await message.answer("Ты отправил ссылку!")
