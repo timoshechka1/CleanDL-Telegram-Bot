@@ -1,25 +1,25 @@
 from playwright.async_api import async_playwright
 
-async def get_tiktok_download_link(url: str) -> str:
+async def get_tiktok_download_link(tiktok_url: str) -> str:
     async with async_playwright() as p:
-        print("Запускаю браузер")
-        browser = await p.chromium.launch(headless=False)  # временно headless=False
+        browser = await p.chromium.launch(headless=False)
         page = await browser.new_page()
-        print("Перехожу на сайт Snaptik")
-        await page.goto("https://snaptik.app/en")
+        await page.goto("https://snaptik.app/ru")
 
-        print("Ввожу ссылку")
-        await page.fill("input[name='url']", url)
+        await page.fill("input[name='url']", tiktok_url)
+
+        try:
+            await page.click("div.modal.is-active div.modal-background", timeout=3000)
+        except:
+            pass
+
         await page.click("button[type='submit']")
-        print("Ожидаю ссылку на скачивание")
 
-        await page.wait_for_selector("a.download-link", timeout=15000)
-        print("Селектор найден")
+        await page.wait_for_selector(".download a", timeout=15000)
 
-        element = await page.query_selector("a.download-link")
-        download_link = await element.get_attribute("href")
-        print("Ссылка на скачивание:", download_link)
+        download_link = await page.get_attribute(".download a", "href")
 
         await browser.close()
         return download_link
+
 
