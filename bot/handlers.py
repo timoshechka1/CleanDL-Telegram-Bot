@@ -1,17 +1,21 @@
-from telegram import Update
-from telegram.ext import ContextTypes
-from bot.snaptik import get_direct_video_url
+import requests
 
-URL_REGEX = r'https?://[^\s]+'
+from aiogram import types
+from bot.snaptik import get_tiktok_download_link
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Приветсвую. Я Телеграм Бот CleanDL, отправьте мне ссылку и я загружу вам видео 🎬")
+@dp.message_handler(commands=["start"])
+async def start_handler(message: types.Message):
+    await message.reply("Пришли ссылку на видео TikTok")
 
-async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    video_link = update.message.text.strip()
+@dp.message_handler()
+async def handle_tiktok_link(message: types.Message):
+    url = message.text.strip()
+    await message.reply("Скачиваю видео...")
 
-    direct_url = get_direct_video_url(video_link)
-    if direct_url:
-        await update.message.reply_video(direct_url)
-    else:
-        await update.message.reply_text("❌ Не удалось получить видео.")
+    try:
+        download_url = get_tiktok_download_link(url)
+        video_data = requests.get(download_url).content
+
+        await message.reply_video(video_data)
+    except Exception as e:
+        await message.reply(f"Произошла ошибка: {e}")
