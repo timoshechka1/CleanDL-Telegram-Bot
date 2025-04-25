@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.cobalt import get_direct_video_url
+from bot.snaptik import get_direct_video_url
 
 URL_REGEX = r'https?://[^\s]+'
 
