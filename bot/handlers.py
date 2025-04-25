@@ -17,7 +17,7 @@ async def handle_tiktok_link(message: Message):
     await message.reply("Скачиваю видео...")
 
     try:
-        download_url = get_tiktok_download_link(url)
+        download_url = await get_tiktok_download_link(url)
         video_data = requests.get(download_url).content
 
         await message.reply_video(video_data)
