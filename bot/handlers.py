@@ -1,21 +1,36 @@
-from aiogram import Router
-from aiogram.types import Message
-from aiogram.filters import Command
-from bot.downloader import download_video
+import yt_dlp
+import requests
+from io import BytesIO
 
-router = Router()
+async def download_video(url: str) -> BytesIO:
+    buffer = BytesIO()
 
-@router.message(Command("start"))
-async def start_handler(message: Message):
-    await message.reply("Пришли ссылку на видео (TikTok, Instagram, YouTube...)")
+    ydl_opts = {
+        'format': 'bestvideo+bestaudio/best',
+        'noplaylist': True,
+        'quiet': True,
+        'no_warnings': True,
+    }
 
-@router.message()
-async def handle_video_link(message: Message):
-    url = message.text.strip()
-    await message.reply("Скачиваю видео...")
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        result = ydl.extract_info(url, download=False)
 
-    try:
-        video_file = await download_video(url)
-        await message.reply_video(video_file)
-    except Exception as e:
-        await message.reply(f"Произошла ошибка: {e}", parse_mode=None)
+        # Иногда result — это плейлист
+        if 'entries' in result:
+            result = result['entries'][0]
+
+        video_url = result.get("url")
+        if not video_url:
+            raise Exception("Не удалось получить прямую ссылку на видео")
+
+        response = requests.get(video_url, stream=True)
+        if not response.ok:
+            raise Exception(f"Ошибка загрузки видео: {response.status_code}")
+
+        for chunk in response.iter_content(chunk_size=1024*1024):
+            buffer.write(chunk)
+
+    buffer.seek(0)
+    buffer.name = "video.mp4"
+    return buffer
+
