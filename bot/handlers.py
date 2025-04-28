@@ -23,7 +23,7 @@ async def download_video(url: str) -> BytesIO:
         'no_warnings': True,
         'outtmpl': '-',
         'merge_output_format': 'mp4',
-        'max_filesize': 50 * 1024 * 1024,
+        'max_filesize': 2000 * 1024 * 1024,
     }
 
     try:
