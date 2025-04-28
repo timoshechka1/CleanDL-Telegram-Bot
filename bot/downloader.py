@@ -1,25 +1,31 @@
-from playwright.async_api import async_playwright
+import yt_dlp
+import requests
+from io import BytesIO
 
-async def get_tiktok_download_link(tiktok_url: str) -> str:
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)
-        page = await browser.new_page()
-        await page.goto("https://snaptik.app/ru")
+async def download_video(url: str) -> BytesIO:
+    buffer = BytesIO()
 
-        await page.fill("input[name='url']", tiktok_url)
+    ydl_opts = {
+        'format': 'bestvideo+bestaudio/best',
+        'outtmpl': '-',
+        'noplaylist': True,
+        'quiet': True,
+        'no_warnings': True,
+        'force_overwrites': True,
+        'merge_output_format': 'mp4',
+    }
 
-        try:
-            await page.click("div.modal.is-active div.modal-background", timeout=3000)
-        except:
-            pass
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        result = ydl.extract_info(url, download=False)
+        video_url = result.get("url")
+        response = requests.get(video_url, stream=True)
 
-        await page.click("button[type='submit']")
+        for chunk in response.iter_content(chunk_size=1024*1024):
+            buffer.write(chunk)
 
-        await page.wait_for_selector(".download a", timeout=15000)
+    buffer.seek(0)
+    buffer.name = "video.mp4"
+    return buffer
 
-        download_link = await page.get_attribute(".download a", "href")
-
-        await browser.close()
-        return download_link
 
 
