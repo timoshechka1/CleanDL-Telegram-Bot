@@ -26,6 +26,3 @@ async def download_video(url: str) -> BytesIO:
     buffer.seek(0)
     buffer.name = "video.mp4"
     return buffer
-
-
-
